@@ -22,6 +22,6 @@ if ($env:WEB_PYTHON) {
     $env:PYTHON = 'C:\UserPython\python.exe'
 }
 & $env:PYTHON -m pip install --disable-pip-version-check --no-warn-script-location "virtualenv>=20"
-& $env:PYTHON -m virtualenv --download venv
+& $env:PYTHON -m virtualenv venv
 
 if($LastExitCode -ne 0) { $host.SetShouldExit($LastExitCode )  }
