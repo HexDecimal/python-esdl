@@ -1,15 +1,11 @@
 #!/usr/bin/env python3
-
 import sys
-import os.path
 
 from setuptools import setup
 
 from subprocess import check_output
 import platform
 import warnings
-
-SDL_VERSION_NEEDED = (2, 0, 5)
 
 
 def get_version():
@@ -60,11 +56,11 @@ def get_package_data():
 
 def get_long_description():
     """Return this projects description."""
-    with open("README.rst", "r") as f:
+    with open("README.md", "r") as f:
         readme = f.read()
-    with open("CHANGELOG.rst", "r") as f:
+    with open("CHANGELOG.md", "r") as f:
         changelog = f.read()
-        changelog = changelog.replace("\nUnreleased\n------------------", "")
+        changelog = changelog.replace("## [Unreleased]\n", "")
     return "\n".join([readme, changelog])
 
 
@@ -74,8 +70,9 @@ setup(
     author="Kyle Benesch",
     author_email="4b796c65+esdl@gmail.com",
     description="An extendable SDL2 wrapper.",
-    #long_description=get_long_description(),
-    url="https://github.com/libtcod/python-tcod",
+    long_description=get_long_description(),
+    long_description_content_type="text/markdown",
+    url="https://github.com/libtcod/python-esdl",
     packages=["esdl"],
     package_data={"esdl": get_package_data()},
     python_requires=">=3.5",
@@ -107,7 +104,7 @@ setup(
         "Topic :: Multimedia :: Graphics",
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
-    keywords="",
+    keywords="SDL SDL2 cffi ffi",
     platforms=["Windows", "MacOS", "Linux"],
     license="zlib/libpng License",
 )
