@@ -1,0 +1,53 @@
+environment:
+  TWINE_USERNAME:
+    secure: sUo+lYht329nQC5JCxEB8w==
+  TWINE_PASSWORD:
+    secure: mjSxOmR8POpeVSL9mwOnH1w/Iq7CKJtQZ8s4tVMHvxLYkAOHU8J5rRTGcVKu1FOysUl9RR9qLoBEbTyDW6bhF4xKIEY/TyPI1PU5dv8uNyNFFslGdVTo/kYa7hHGzmT+w/YF+TpbiXj+DLNAD73LrkKvcvgARa4rViVlyBF2Z0Vd+oFQyR8z1NHHiJbW/unHH/NCoX2VG1nKXh3euLr8iNmQfedrNzLgU7wouEnXxgZQVFF5ndRMY2LwbS9Q4rU7SEyBXV2Gsy9MGsDSmB5rBA==
+  DEPLOY: true
+  EXTRA_SETUP_ARGS: ""
+  matrix:
+  - PYTHON: C:\Python35-x64\python.exe
+    platform: x64
+    EXTRA_SETUP_ARGS: "--py-limited-api cp35"
+  - PYTHON: C:\Python35\python.exe
+    platform: Any CPU
+    EXTRA_SETUP_ARGS: "--py-limited-api cp35"
+  - PYTHON: C:\Python36-x64\python.exe
+    platform: x64
+    DEPLOY: false
+  - PYTHON: C:\Python37-x64\python.exe
+    platform: x64
+    DEPLOY: false
+  - PYTHON: C:\Python38-x64\python.exe
+    platform: x64
+    DEPLOY: false
+  - PYPY3: pypy3.6-v7.2.0
+    platform: Any CPU
+  - PYPY3: pypy3.6-v7.3.0
+    platform: Any CPU
+  - PYPY3: pypy3.6-v7.3.1
+    platform: Any CPU
+
+clone_depth: 50
+
+install:
+- ps: ". .ci/install_python.ps1"
+- cmd: "%ACTIVATE_VENV%"
+- cmd: "set PATH=%APPVEYOR_BUILD_FOLDER%\\venv\\bin;%PATH%"
+- cmd: "set PATH=%PATH%;C:\\MinGW\\bin"
+- cmd: "python --version"
+- cmd: "python -m pip install --upgrade pip"
+- cmd: "pip install --requirement requirements.txt"
+- cmd: "python -O setup.py build sdist develop bdist_wheel %EXTRA_SETUP_ARGS%"
+build: off
+before_test:
+- cmd: "pip install pytest pytest-cov"
+test_script:
+- cmd: "pytest -v"
+
+on_success:
+-
+
+deploy_script:
+- "if defined APPVEYOR_REPO_TAG_NAME pip install twine"
+- "if defined APPVEYOR_REPO_TAG_NAME if %DEPLOY%==true twine upload --skip-existing dist/*"
