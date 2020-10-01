@@ -72,7 +72,7 @@ setup(
     description="An extendable SDL2 wrapper.",
     long_description=get_long_description(),
     long_description_content_type="text/markdown",
-    url="https://github.com/libtcod/python-esdl",
+    url="https://github.com/HexDecimal/python-esdl",
     packages=["esdl"],
     package_data={"esdl": get_package_data()},
     python_requires=">=3.5",

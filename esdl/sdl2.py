@@ -1,4 +1,4 @@
-"""This module handles loading of the libtcod cffi API.
+"""This module handles loading of the SDL2 FFI.
 """
 import sys
 import os
