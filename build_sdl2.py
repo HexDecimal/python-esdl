@@ -134,9 +134,9 @@ class SDLParser(pcpp.Preprocessor):  # type: ignore
     @staticmethod
     def scrub_tokens(toks: List[Any]) -> None:
         """Scrub the tokens from a directive so that CFFI can parse it better."""
-        # toks[0] is the symbol.
-        # toks[1] is whitespace/
-        # Replace toks[2] with the "..." constant.
+        assert toks[0].type == "CPP_ID"  # toks[0] is the symbol.
+        assert toks[1].type == "CPP_WS"  # toks[1] is whitespace/
+        # Replace toks[2] with a "..." constant.
         toks[2].type = "CPP_ID"
         toks[2].value = "..."
         # Replace anything after that with whitespace.
@@ -159,6 +159,10 @@ class SDLParser(pcpp.Preprocessor):  # type: ignore
                 if len(toks) > 3:
                     self.scrub_tokens(toks)
                 return None  # Execute and add to the output.
+            if "AUDIO_" in toks[0].value and toks[1].type != "CPP_LPAREN":
+                # Keep the SDL_AUDIO_X constants, but skip macro functions.
+                self.scrub_tokens(toks)
+                return None
             if "SDL_HINT_" in toks[0].value:
                 self.tracked_strings[toks[0].value] = toks[2].value
         return True  # Execute and remove from the output.
