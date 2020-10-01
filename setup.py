@@ -77,8 +77,7 @@ setup(
     package_data={"esdl": get_package_data()},
     python_requires=">=3.5",
     install_requires=[
-        "cffi~=1.13",  # Also required by pyproject.toml.
-        "numpy~=1.10" if not is_pypy else "",
+        "numpy>=1.10; platform.python_implementation != 'PyPy'",
     ],
     cffi_modules=["build_sdl2.py:ffi"],
     classifiers=[

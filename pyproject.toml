@@ -1,10 +1,10 @@
 [build-system]
 requires = [
-    "setuptools",
-    "wheel",
-    "cffi~=1.14",
+    "setuptools>=50.3",
+    "wheel>=0.35",
+    "cffi>=1.14.2",
     "pycparser>=2.14",
-	"pcpp",
+    "pcpp>=1.21",
 ]
 
 [tool.black]

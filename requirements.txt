@@ -1,0 +1,6 @@
+setuptools==50.3
+wheel==0.35
+cffi==1.14.3
+pycparser==2.14
+pcpp==1.21
+numpy==1.19
