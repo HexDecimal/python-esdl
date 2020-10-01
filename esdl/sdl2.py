@@ -1,4 +1,6 @@
 """This module handles loading of the SDL2 FFI.
+
+>>> from esdl import lib, ffi
 """
 import sys
 import os
