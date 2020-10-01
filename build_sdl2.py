@@ -7,7 +7,8 @@ import platform
 import io
 import shutil
 import subprocess
-from typing import List, Tuple, Any
+from typing import Dict, List, Tuple, Any, Optional
+import warnings
 import zipfile
 
 import cffi  # type: ignore
@@ -112,13 +113,55 @@ class SDLParser(pcpp.Preprocessor):  # type: ignore
 
     def __init__(self) -> None:
         super().__init__()
+        # Extra tracked strings.
+        self.tracked_strings = {}  # type: Dict[str, str]
         self.line_directive = None  # Don't output line directives.
 
-    def get_output(self) -> str:
-        """Return this objects current tokens as a string."""
+    def get_output(self) -> Tuple[str, str]:
+        """Return this objects current tokens as strings.
+
+        This returns two strings since the 2nd will have warnings to suppress.
+        """
         with io.StringIO() as buffer:
             self.write(buffer)
-            return buffer.getvalue()
+            main_out = buffer.getvalue()
+        # Append tracked_strings to the extra output.
+        extra_out = ""
+        for name, value in self.tracked_strings.items():
+            extra_out += "static const char %s[] = %s;\n" % (name, value)
+        return main_out, extra_out
+
+    @staticmethod
+    def scrub_tokens(toks: List[Any]) -> None:
+        """Scrub the tokens from a directive so that CFFI can parse it better."""
+        # toks[0] is the symbol.
+        # toks[1] is whitespace/
+        # Replace toks[2] with the "..." constant.
+        toks[2].type = "CPP_ID"
+        toks[2].value = "..."
+        # Replace anything after that with whitespace.
+        for tok in toks[3:]:
+            tok.type = "CPP_WS"
+            tok.value = " "
+
+    def on_directive_handle(
+        self,
+        directive: Any,
+        toks: List[Any],
+        ifpassthru: bool,
+        precedingtoks: List[Any],
+    ) -> Optional[bool]:
+        """Trys to track some specific #define directives."""
+        super().on_directive_handle(directive, toks, ifpassthru, precedingtoks)
+        if directive.value == "define" and toks:
+            if "SDL_INIT_" in toks[0].value:
+                # Keep the SDL_INIT_X flags.
+                if len(toks) > 3:
+                    self.scrub_tokens(toks)
+                return None  # Execute and add to the output.
+            if "SDL_HINT_" in toks[0].value:
+                self.tracked_strings[toks[0].value] = toks[2].value
+        return True  # Execute and remove from the output.
 
     def on_include_not_found(
         self, is_system_include: bool, curdir: str, includepath: str
@@ -171,7 +214,7 @@ typedef int... size_t;
 #include <SDL.h>
 """
 )
-sdl2_cdef = parser.get_output()
+sdl2_cdef, sdl2_cdef_extra = parser.get_output()
 sdl2_cdef = RE_VAFUNC.sub("", sdl2_cdef)
 sdl2_cdef = RE_INLINE.sub("", sdl2_cdef)
 sdl2_cdef = RE_PIXELFORMAT.sub(r"\g<name> = ...", sdl2_cdef)
@@ -186,11 +229,18 @@ sdl2_cdef = (
 )
 if os.environ.get("DEBUG_CDEF"):
     with open("sdl2_cdef.c", "w") as f:
-        print(sdl2_cdef, file=f)
+        print(sdl2_cdef + sdl2_cdef_extra, file=f)
+
+sdl2_cdef += "#define SDL_INIT_AUDIO ...\n"
 
 ffi = cffi.FFI()
 ffi.cdef(sdl2_cdef)
-
+with warnings.catch_warnings():
+    # Ignore warnings about string literals, they work in this call.
+    warnings.filterwarnings(
+        "ignore", "String literal found in cdef", UserWarning
+    )
+    ffi.cdef(sdl2_cdef_extra)
 
 include_dirs = []
 extra_compile_args = []
