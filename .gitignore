@@ -66,16 +66,16 @@ venv.bak/
 
 # SDL2 files
 dependencies/SDL2*
-gg/_*.pyd
-gg/*.dll
-gg/SDL2.framework
+esdl/_*.pyd
+esdl/*.dll
+esdl/SDL2.framework
 
 # Custom
 Release/
 .benchmarks
 deb_dist/
 *.tar.gz
-gg/version.py
+esdl/version.py
 .pybuild/
 .debhelper/
 debian/files
