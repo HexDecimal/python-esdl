@@ -7,8 +7,6 @@ import atexit
 import platform
 from typing import Any  # noqa: F401
 
-import cffi  # type: ignore
-
 __sdl_version__ = ""
 
 def get_architecture() -> str:
