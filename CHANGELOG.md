@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 This project attempts to adhere to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Added
+- Export `SDL_INIT_X`, `SDL_HINT_X`, `SDL_AUDIO_X` and `AUDIO_X` constansts.
 
 ## [0.0.1] - 2020-10-01
 ### Added
