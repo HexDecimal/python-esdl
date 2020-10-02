@@ -1,0 +1,38 @@
+language: python
+jobs:
+  include:
+  - os: linux
+    python: 3.8
+    services:
+      - docker
+    env:
+      DOCKER_IMAGE=quay.io/pypa/manylinux2014_x86_64
+      PLAT=manylinux2014_x86_64
+      PYVERSION=cp35-cp35m
+
+os: linux
+dist: focal
+
+addons:
+  apt:
+    packages:
+      - libsdl2-dev
+
+services:
+  - xvfb
+
+before_install:
+- docker pull $DOCKER_IMAGE
+
+install:
+- "docker run --rm -e PLAT=$PLAT -e PYVERSION=$PYVERSION -v `pwd`:/io $DOCKER_IMAGE /io/.ci/manylinux_build.sh"
+- python -m pip install -r requirements.txt
+- python setup.py sdist develop
+before_script:
+- pip install --upgrade pytest pytest-cov
+script:
+- ls dist
+- pytest -v
+after_success:
+- if [[ -n "$TRAVIS_TAG" ]]; then pip install --upgrade twine; fi
+- if [[ -n "$TRAVIS_TAG" ]]; then twine upload --skip-existing dist/*; fi
