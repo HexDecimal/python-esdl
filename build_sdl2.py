@@ -154,17 +154,17 @@ class SDLParser(pcpp.Preprocessor):  # type: ignore
         """Trys to track some specific #define directives."""
         super().on_directive_handle(directive, toks, ifpassthru, precedingtoks)
         if directive.value == "define" and toks:
-            if "SDL_INIT_" in toks[0].value:
+            if "SDL_HINT_" in toks[0].value:
+                self.tracked_strings[toks[0].value] = toks[2].value
+            elif "SDL_INIT_" in toks[0].value:
                 # Keep the SDL_INIT_X flags.
                 if len(toks) > 3:
                     self.scrub_tokens(toks)
                 return None  # Execute and add to the output.
-            if "AUDIO_" in toks[0].value and toks[1].type != "CPP_LPAREN":
+            elif "AUDIO_" in toks[0].value and toks[1].type != "CPP_LPAREN":
                 # Keep the SDL_AUDIO_X constants, but skip macro functions.
                 self.scrub_tokens(toks)
                 return None
-            if "SDL_HINT_" in toks[0].value:
-                self.tracked_strings[toks[0].value] = toks[2].value
         return True  # Execute and remove from the output.
 
     def on_include_not_found(
