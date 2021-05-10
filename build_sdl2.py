@@ -190,6 +190,13 @@ if os.environ.get("DEBUG_CDEF"):
 
 ffi = cffi.FFI()
 ffi.cdef(sdl2_cdef)
+ffi.cdef(
+    """
+extern "Python" {
+// SDL_AudioCallback callback.
+void _sdl_audio_callback(void* userdata, Uint8* stream, int len);
+}
+""")
 
 
 include_dirs = []

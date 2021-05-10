@@ -13,16 +13,7 @@ class Subsystem(enum.IntFlag):
     GAMECONTROLLER = 0x2000
     EVENTS = 0x4000
     SENSOR = 0x8000
-    EVERYTHING = (
-        TIMER
-        | AUDIO
-        | VIDEO
-        | JOYSTICK
-        | HAPTIC
-        | GAMECONTROLLER
-        | EVENTS
-        | SENSOR
-    )
+    EVERYTHING = TIMER | AUDIO | VIDEO | JOYSTICK | HAPTIC | GAMECONTROLLER | EVENTS | SENSOR
 
 
 def _check(result: int) -> int:
@@ -40,7 +31,7 @@ def quit(flags: int = Subsystem.EVERYTHING) -> None:
 
 
 def _get_error() -> str:
-    return str(ffi.string(SDL_GetError()), encoding="utf-8")
+    return str(ffi.string(lib.SDL_GetError()), encoding="utf-8")
 
 
 class _PowerState(enum.IntEnum):
