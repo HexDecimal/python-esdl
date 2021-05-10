@@ -1,15 +1,15 @@
 """This module handles loading of the SDL2 FFI.
 """
-import sys
-import os
-
 import atexit
+import os
 import platform
+import sys
 from typing import Any  # noqa: F401
 
 import cffi  # type: ignore
 
 __sdl_version__ = ""
+
 
 def get_architecture() -> str:
     """Return the Windows architecture, one of "x86" or "x64"."""
@@ -53,7 +53,8 @@ if os.environ.get("READTHEDOCS"):
     # Allows an import without building the cffi module first.
     lib = ffi = _Mock()
 else:
-    from esdl._sdl2 import lib, ffi  # type: ignore # noqa: F401
+    from esdl._sdl2 import ffi, lib  # type: ignore # noqa: F401
+
     atexit.register(lib.SDL_Quit)
     __sdl_version__ = get_sdl_version()
 
